@@ -3,16 +3,18 @@ package com.testapp.kafka;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.TopicPartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 public class KafkaRebalanceListener {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(KafkaRebalanceListener.class);
 
   @Autowired
   private ConsumerFactory<Object, Object> consumerFactory;
@@ -22,7 +24,7 @@ public class KafkaRebalanceListener {
   public void onPartitionsAssigned() {
 
     Consumer<Object, Object> consumer = consumerFactory.createConsumer();
-    String topicName = "com.avaloq.acp.bde.obj_asset";
+    String topicName = "test-topic";
     List<TopicPartition> partitions = Arrays.asList(
         new TopicPartition(topicName, 0),
         new TopicPartition(topicName, 1),
@@ -44,7 +46,7 @@ public class KafkaRebalanceListener {
       long offset = consumer.committed(partition).offset();
 
       while (offset != 0) {
-        log.info("Partition : {}, offset {}", partition, offset);
+        LOGGER.info("Partition : {}, offset {}", partition, offset);
         offset = consumer.committed(partition).offset();
 
         try {
